@@ -3,7 +3,11 @@ import React, { useRef, useState } from 'react';
 
 export default function Register() {
     const myFormData = useRef(null);
-    const [error, setError] = useState('');
+    const [errorMessages, setErrorMessages] = useState({
+        email: '',
+        password: '',
+        general: ''
+    });
     const [success, setSuccess] = useState('');
 
     const SubmitForm = async (event) => {
@@ -17,12 +21,37 @@ export default function Register() {
         try {
             const response = await axios.post("http://150.0.0.187:5001/api/login", data);
             setSuccess('Login successful!');
-            setError('');
+            setErrorMessages({ email: '', password: '', general: '' });
             console.log('Success:', response.data);
         } catch (error) {
             setSuccess('');
-            setError(error.response?.data?.message || 'An error occurred. Please try again.');
-            console.error('Error:', error);
+            
+            if (error.response) {
+                const { data } = error.response;
+
+                // Reset error messages
+                let newErrors = { email: '', password: '', general: '' };
+
+                if (data.message) {
+                    newErrors.general = data.message;
+                }
+
+                if (data.errors) {
+                    Object.entries(data.errors).forEach(([field, message]) => {
+                        if (field in newErrors) {
+                            newErrors[field] = message;
+                        }
+                    });
+                }
+
+                setErrorMessages(newErrors);
+            } else if (error.request) {
+                setErrorMessages({ email: '', password: '', general: 'No response from server. Please check your network connection.' });
+            } else {
+                setErrorMessages({ email: '', password: '', general: 'An unexpected error occurred.' });
+            }
+            
+            console.error('Error:', error.response ? error.response.data : error);
         }
     };
 
@@ -36,14 +65,14 @@ export default function Register() {
                                 <div className="col-12">
                                     <label htmlFor="validationDefault01">User email</label>
                                     <input
-                                        type="email"
+                                        type="text"
                                         className="form-control"
                                         id="validationDefault01"
                                         name="email"
                                         placeholder="Please enter your email"
                                         required
                                     />
-                                    <small className="text-danger">{error}</small>
+                                    <small className="text-danger">{errorMessages.email}</small>
                                 </div>
                                 <div className="col-12">
                                     <label htmlFor="validationDefault02">Password</label>
@@ -55,11 +84,12 @@ export default function Register() {
                                         placeholder="Please enter your password"
                                         required
                                     />
-                                    <small className="text-danger">{error}</small>
+                                    <small className="text-danger">{errorMessages.password}</small>
                                 </div>
                             </div>
                             <button className="btn btn-primary mt-3" type="submit">Login</button>
                             {success && <div className="alert alert-success mt-3">{success}</div>}
+                            {errorMessages.general && <div className="alert alert-danger mt-3">{errorMessages.general}</div>}
                         </form>
                     </div>
                 </div>
