@@ -9,6 +9,7 @@ export default function Register() {
         general: ''
     });
     const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false); // New state for loading
 
     const SubmitForm = async (event) => {
         event.preventDefault();
@@ -18,6 +19,8 @@ export default function Register() {
             password: formData.get('password')
         };
 
+        setLoading(true); // Start loading
+
         try {
             const response = await axios.post("http://150.0.0.187:5001/api/login", data);
             setSuccess('Login successful!');
@@ -25,7 +28,7 @@ export default function Register() {
             console.log('Success:', response.data);
         } catch (error) {
             setSuccess('');
-            
+
             if (error.response) {
                 const { data } = error.response;
 
@@ -50,8 +53,10 @@ export default function Register() {
             } else {
                 setErrorMessages({ email: '', password: '', general: 'An unexpected error occurred.' });
             }
-            
+
             console.error('Error:', error.response ? error.response.data : error);
+        } finally {
+            setLoading(false); // End loading
         }
     };
 
@@ -87,7 +92,14 @@ export default function Register() {
                                     <small className="text-danger">{errorMessages.password}</small>
                                 </div>
                             </div>
-                            <button className="btn btn-primary mt-3" type="submit">Login</button>
+                            <button className="btn btn-primary mt-3" type="submit" disabled={loading}>
+                                {loading ? 'Logging in...' : 'Login'}
+                            </button>
+                            {loading && (
+                                <div className="spinner-border text-primary mt-3" role="status">
+                                    <span className="sr-only">Loading...</span>
+                                </div>
+                            )}
                             {success && <div className="alert alert-success mt-3">{success}</div>}
                             {errorMessages.general && <div className="alert alert-danger mt-3">{errorMessages.general}</div>}
                         </form>
