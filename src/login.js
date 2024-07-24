@@ -22,7 +22,7 @@ export default function Register() {
         setLoading(true); // Start loading
 
         try {
-            const response = await axios.post("http://150.0.0.187:5001/api/login", data);
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, data);
             setSuccess('Login successful!');
             setErrorMessages({ email: '', password: '', general: '' });
             console.log('Success:', response.data);
