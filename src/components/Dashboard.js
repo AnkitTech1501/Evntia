@@ -91,19 +91,35 @@ const Dashboard = () => {
         {
             name: 'Actions',
             cell: row => (
-                <div>
-                    <a href="#" className="u-border-none u-btn u-button-style u-palette-3-base u-text-body-color u-text-hover-white" style={{ display: 'inline-block' }}>
-                        <span className="u-file-icon"><img src="images/5431295.png" alt="View" className="img-fluid" /></span>
+                <div className="d-flex flex-wrap-column justify-content-center">
+                    <a
+                        href="#"
+                        className="btn btn-primary m-1"
+                        title="View"
+                        style={{ maxWidth: '60px', minWidth: '32px' }}
+                    >
+                        <i className="bi bi-eye">test</i>
                     </a>
-                    <a href="#" className="u-border-none u-btn u-button-style u-palette-2-base u-text-body-color u-text-hover-white" style={{ display: 'inline-block' }}>
-                        <span className="u-file-icon"><img src="images/8900103.png" alt="Edit" className="img-fluid" /></span>
+                    <a
+                        href="#"
+                        className="btn btn-secondary m-1"
+                        title="Edit"
+                        style={{ maxWidth: '60px', minWidth: '32px' }}
+                    >
+                        <i className="bi bi-pencil">test</i>
                     </a>
-                    <a href="#" className="u-border-none u-btn u-button-style u-palette-5-base u-text-body-color u-text-hover-white" style={{ display: 'inline-block' }}>
-                        <span className="u-file-icon"><img src="images/2337746.png" alt="Delete" className="img-fluid" /></span>
+                    <a
+                        href="#"
+                        className="btn btn-danger m-1"
+                        title="Delete"
+                        style={{ maxWidth: '60px', minWidth: '32px' }}
+                    >
+                        <i className="bi bi-trash">test</i>
                     </a>
                 </div>
             ),
-        },
+        }
+        
     ];
 
     function capitalizeWords(string) {
@@ -184,7 +200,7 @@ const Dashboard = () => {
             <section className="u-align-center u-clearfix u-section-1" id="sec-0e20">
                 <div className="u-clearfix u-sheet u-sheet-1">
                     <div className="row">
-                        <div className="col-md-3">
+                        <div className="col-12 col-md-6 col-lg-3 mb-3">
                             <div className="u-align-center u-container-style u-grey-10 u-shape-rounded u-similar-container u-container">
                                 <div className="u-container-layout">
                                     <h4 className="u-custom-font u-font-serif u-text">Company Name</h4>
@@ -192,7 +208,7 @@ const Dashboard = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-3">
+                        <div className="col-12 col-md-6 col-lg-3 mb-3">
                             <div className="u-align-center u-container-style u-grey-10 u-shape-rounded u-similar-container u-container">
                                 <div className="u-container-layout">
                                     <h4 className="u-custom-font u-font-serif u-text">PM Name</h4>
@@ -208,20 +224,23 @@ const Dashboard = () => {
                             <RingLoader color="#123abc" />
                         </div>
                     ) : (
-                        <DataTable
-                            columns={columns}
-                            data={userData}
-                            customStyles={customStyles}
-                            pagination
-                            paginationServer
-                            paginationTotalRows={totalRows}
-                            onChangePage={handlePageChange}
-                            highlightOnHover
-                        />
+                        <div className="table-responsive">
+                            <DataTable
+                                columns={columns}
+                                data={userData}
+                                customStyles={customStyles}
+                                pagination
+                                paginationServer
+                                paginationTotalRows={totalRows}
+                                onChangePage={handlePageChange}
+                                highlightOnHover
+                            />
+                        </div>
                     )}
                     {error && <div className="alert alert-danger mt-3">{error}</div>}
                 </div>
             </section>
+
         </div>
     );
 };
