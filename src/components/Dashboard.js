@@ -14,10 +14,11 @@ const Dashboard = () => {
     const [totalRows, setTotalRows] = useState(0);
     const [companyName, setCompanyName] = useState('');
     const [pmName, setPmName] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchData = async (page = 1) => {
+        const fetchData = async (page = 1, search = '') => {
             const token = sessionStorage.getItem('token');
             if (!token) {
                 navigate('/login');
@@ -27,7 +28,10 @@ const Dashboard = () => {
             setLoading(true);
 
             try {
-                const response = await axios.post(`${process.env.REACT_APP_API_URL}/dashboard?page=${page}`, {}, {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/dashboard`, {
+                    page,
+                    search,
+                }, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -54,8 +58,8 @@ const Dashboard = () => {
             }
         };
 
-        fetchData(currentPage);
-    }, [currentPage, navigate]);
+        fetchData(currentPage, searchTerm);
+    }, [currentPage, searchTerm, navigate]);
 
     const handleLogout = () => {
         sessionStorage.removeItem('token');
@@ -119,7 +123,6 @@ const Dashboard = () => {
                 </div>
             ),
         }
-        
     ];
 
     function capitalizeWords(string) {
@@ -130,6 +133,10 @@ const Dashboard = () => {
 
     const handlePageChange = page => {
         setCurrentPage(page);
+    };
+
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
     };
 
     return (
@@ -218,6 +225,17 @@ const Dashboard = () => {
                         </div>
                     </div>
 
+                    {/* Search Input */}
+                    <div className="mb-3">
+                        <input
+                            type="text"
+                            className="form-control search-input"
+                            placeholder="Search..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                        />
+                    </div>
+
                     {/* DataTable Component */}
                     {loading ? (
                         <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
@@ -237,10 +255,8 @@ const Dashboard = () => {
                             />
                         </div>
                     )}
-                    {error && <div className="alert alert-danger mt-3">{error}</div>}
                 </div>
             </section>
-
         </div>
     );
 };
