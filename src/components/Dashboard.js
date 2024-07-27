@@ -226,12 +226,12 @@ const Dashboard = () => {
                             <div class="u-layout-row">
                                 <div class="u-align-center u-container-style u-layout-cell u-size-30 u-layout-cell-1">
                                     <div class="u-container-layout u-container-layout-1">
-                                        <h4 class="u-text u-text-1">{companyName} </h4>
+                                        <h4 class="u-text u-text-1">Company Name : {companyName} </h4>
                                     </div>
                                 </div>
                                 <div class="u-align-center u-container-style u-layout-cell u-size-30 u-layout-cell-2">
                                     <div class="u-container-layout u-container-layout-2">
-                                        <h4 class="u-text u-text-2">{pmName}</h4>
+                                        <h4 class="u-text u-text-2">PM : {pmName}</h4>
                                     </div>
                                 </div>
                             </div>
