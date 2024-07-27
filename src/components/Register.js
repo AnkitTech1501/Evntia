@@ -27,6 +27,7 @@ const Register = () => {
     useEffect(() => {
         // Fetch roles from the API
         const fetchRoles = async () => {
+            console.log(`${process.env.REACT_APP_API_URL}/roles`);
             try {
                 const response = await axios.get(`${process.env.REACT_APP_API_URL}/roles`);
                 setRoles(response.data);
