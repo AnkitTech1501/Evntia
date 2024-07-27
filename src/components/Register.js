@@ -12,15 +12,64 @@ const Register = () => {
         password_confirmation: '',
         username: '',
         role: '',
+        pm: '', // For PM errors
+        company: '', // For company errors
         general: ''
     });
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate(); // Hook for navigation
+    const [roles, setRoles] = useState([]);
+    const [pm, setPms] = useState([]); // For storing PMs
+    const [companies, setCompanies] = useState([]); // For storing companies
+    const [selectedRole, setSelectedRole] = useState(''); // To track selected role
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Initialize jQuery or other scripts if needed
+        // Fetch roles from the API
+        const fetchRoles = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/roles`);
+                setRoles(response.data);
+            } catch (error) {
+                console.error('Error fetching roles:', error);
+            }
+        };
+
+        fetchRoles();
     }, []);
+
+    useEffect(() => {
+        // Fetch PMs and companies if the selected role is 'Client'
+        if (selectedRole === '1') { // Assuming '1' is the ID for 'Client'
+            const fetchPMs = async () => {
+                try {
+                    const response = await axios.get(`${process.env.REACT_APP_API_URL}/pm`);
+                    setPms(response.data);
+                } catch (error) {
+                    console.error('Error fetching PMs:', error);
+                }
+            };
+
+            const fetchCompanies = async () => {
+                try {
+                    const response = await axios.get(`${process.env.REACT_APP_API_URL}/companies`);
+                    setCompanies(response.data);
+                } catch (error) {
+                    console.error('Error fetching companies:', error);
+                }
+            };
+
+            fetchPMs();
+            fetchCompanies();
+        } else {
+            setPms([]); // Clear PMs if another role is selected
+            setCompanies([]); // Clear companies if another role is selected
+        }
+    }, [selectedRole]);
+
+    const handleRoleChange = (event) => {
+        setSelectedRole(event.target.value);
+    };
 
     const SubmitForm = async (event) => {
         event.preventDefault();
@@ -30,7 +79,9 @@ const Register = () => {
             email: formData.get('email'),
             role: parseInt(formData.get('role')),
             password: formData.get('password'),
-            password_confirmation: formData.get('password_confirmation')
+            password_confirmation: formData.get('password_confirmation'),
+            pm: formData.get('pm'), // Include PM in the data
+            company: formData.get('company') // Include company in the data
         };
 
         setLoading(true);
@@ -38,7 +89,7 @@ const Register = () => {
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/register`, data);
             setSuccess('Registration successful!');
-            setErrorMessages({ email: '', password: '', password_confirmation: '', username: '', role: '', general: '' });
+            setErrorMessages({ email: '', password: '', password_confirmation: '', username: '', role: '', pm: '', company: '', general: '' });
 
             // Save JWT token to sessionStorage
             sessionStorage.setItem('token', response.data.data.token);
@@ -51,7 +102,7 @@ const Register = () => {
             if (error.response) {
                 const { data } = error.response;
 
-                let newErrors = { email: '', password: '', password_confirmation: '', username: '', role: '', general: '' };
+                let newErrors = { email: '', password: '', password_confirmation: '', username: '', role: '', pm: '', company: '', general: '' };
 
                 if (data.message) {
                     newErrors.general = data.message;
@@ -67,9 +118,9 @@ const Register = () => {
 
                 setErrorMessages(newErrors);
             } else if (error.request) {
-                setErrorMessages({ email: '', password: '', password_confirmation: '', username: '', role: '', general: 'No response from server. Please check your network connection.' });
+                setErrorMessages({ email: '', password: '', password_confirmation: '', username: '', role: '', pm: '', company: '', general: 'No response from server. Please check your network connection.' });
             } else {
-                setErrorMessages({ email: '', password: '', password_confirmation: '', username: '', role: '', general: 'An unexpected error occurred.' });
+                setErrorMessages({ email: '', password: '', password_confirmation: '', username: '', role: '', pm: '', company: '', general: 'An unexpected error occurred.' });
             }
 
             console.error('Error:', error.response ? error.response.data : error);
@@ -113,36 +164,59 @@ const Register = () => {
                                             </div>
                                             <div className="u-form-group u-form-name u-label-none">
                                                 <label htmlFor="role" className="u-label">Role</label>
-                                                <select id="role" name="role" className="u-grey-15 u-input u-input-rectangle u-radius u-text-grey-40 u-input-3" required>
+                                                <select id="role" name="role" className="u-grey-15 u-input u-input-rectangle u-radius u-text-grey-40 u-input-3" required onChange={handleRoleChange}>
                                                     <option value="">Select Role</option>
-                                                    <option value="1">Admin</option>
-                                                    <option value="2">User</option>
-                                                    <option value="3">Moderator</option>
+                                                    {roles.map(role => (
+                                                        <option key={role.id} value={role.id}>{role.name}</option>
+                                                    ))}
                                                 </select>
                                                 <small className="text-danger">{errorMessages.role}</small>
                                             </div>
-                                            <div className="u-form-group u-label-none">
+                                            
+                                            {/* Conditionally render PM selection field */}
+                                            {selectedRole === '1' && (
+                                                <>
+                                                    <div className="u-form-group u-form-name u-label-none">
+                                                        <label htmlFor="pm" className="u-label">Select PM</label>
+                                                        <select id="pm" name="pm" className="u-grey-15 u-input u-input-rectangle u-radius u-text-grey-40 u-input-4">
+                                                            <option value="">Select PM</option>
+                                                            {pm.map(pm => (
+                                                                <option key={pm.PMId} value={pm.PMId}>{pm.PMname}</option>
+                                                            ))}
+                                                        </select>
+                                                        <small className="text-danger">{errorMessages.pm}</small>
+                                                    </div>
+                                                    <div className="u-form-group u-form-name u-label-none">
+                                                        <label htmlFor="company" className="u-label">Select Company</label>
+                                                        <select id="company" name="company" className="u-grey-15 u-input u-input-rectangle u-radius u-text-grey-40 u-input-5">
+                                                            <option value="">Select Company</option>
+                                                            {companies.map(company => (
+                                                                <option key={company.compId} value={company.compId}>{company.clientname}</option>
+                                                            ))}
+                                                        </select>
+                                                        <small className="text-danger">{errorMessages.company}</small>
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            <div className="u-form-group u-form-name u-label-none">
                                                 <label htmlFor="password" className="u-label">Password</label>
-                                                <input type="password" placeholder="Password" id="password" name="password" className="u-grey-15 u-input u-input-rectangle u-radius u-text-grey-40 u-input-4" required />
+                                                <input type="password" placeholder="Password" id="password" name="password" className="u-grey-15 u-input u-input-rectangle u-radius u-text-grey-40 u-input-6" required />
                                                 <small className="text-danger">{errorMessages.password}</small>
                                             </div>
-                                            <div className="u-form-group u-label-none">
+                                            <div className="u-form-group u-form-name u-label-none">
                                                 <label htmlFor="password_confirmation" className="u-label">Confirm Password</label>
-                                                <input type="password" placeholder="Confirm Password" id="password_confirmation" name="password_confirmation" className="u-grey-15 u-input u-input-rectangle u-radius u-text-grey-40 u-input-5" required />
+                                                <input type="password" placeholder="Confirm Password" id="password_confirmation" name="password_confirmation" className="u-grey-15 u-input u-input-rectangle u-radius u-text-grey-40 u-input-7" required />
                                                 <small className="text-danger">{errorMessages.password_confirmation}</small>
                                             </div>
-                                            {/* <div className="u-form-group u-form-submit">
-                                                <button type="submit" className="u-btn u-btn-submit u-button-style">{loading ? 'Loading...' : 'Register'}</button>
-                                                <div className="u-form-send-message u-form-send-success" style={{ display: success ? 'block' : 'none' }}>
-                                                    <p>{success}</p>
-                                                </div>
-                                                <div className="u-form-send-message u-form-send-error" style={{ display: errorMessages.general ? 'block' : 'none' }}>
-                                                    <p>{errorMessages.general}</p>
-                                                </div>
+                                            {/* <div className="u-align-center u-form-group u-form-submit">
+                                                <button type="submit" className="u-active-palette-1-light-2 u-border-none u-btn u-btn-round u-btn-submit u-button-style u-hover-palette-1-light-1 u-radius-50 u-text-active-grey-90 u-text-grey-90 u-text-hover-grey-90 u-white u-btn-1" disabled={loading}>
+                                                    Register
+                                                </button>
                                             </div> */}
                                             <div className="u-align-center u-form-group u-form-submit">
                                                 <button type="submit" className="u-border-none u-btn u-btn-round u-btn-submit u-button-style u-gradient u-none u-radius u-text-body-alt-color u-btn-1" disabled={loading}>
-                                                    {loading ? 'Logging in...' : 'Login'}
+                                                    {loading ? 'Logging in...' : 'Register'}
                                                 </button>
                                                 {loading && (
                                                     <div className="spinner-border text-primary mt-3" role="status">
@@ -154,6 +228,11 @@ const Register = () => {
                                             </div>
                                         </form>
                                     </div>
+                                </div>
+                            </div>
+                            <div className="u-container-style u-layout-cell u-size-20 u-layout-cell-3">
+                                <div className="u-container-layout u-container-layout-4">
+                                    <img className="u-align-center-xs u-align-right-lg u-align-right-md u-align-right-sm u-align-right-xl u-image u-image-contain u-image-default u-image-4" src="/images/Exicon_Event-Desk_Right-side-Image.png" alt="" />
                                 </div>
                             </div>
                         </div>
