@@ -1,0 +1,19 @@
+/* EventModal.css */
+.custom-footer {
+    background-color: #f8f9fa; /* Light grey background */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.custom-footer img {
+    max-height: 100px; /* Adjust as needed */
+    max-width: 100%; /* Ensure the image scales properly */
+}
+
+@media (max-width: 576px) {
+    .modal-dialog {
+        max-width: 100%; /* Full width on small screens */
+        margin: 10px; /* Small margin on small screens */
+    }
+}
