@@ -145,6 +145,7 @@ const Dashboard = () => {
     };
 
     return (
+        <>
         <div className="u-body u-xl-mode" data-lang="en">
             <header className="border-bottom py-2">
                 <div className="row align-items-center">
@@ -280,6 +281,11 @@ const Dashboard = () => {
                 </div>
             </section>
         </div>
+        <div className = "container-fluid mt-4" style = {{backgroundColor:"#333333",height:"250px"}}>
+            <p className='text-center text-white p-4 m-5'>Sample text. Click to select the Text Element.</p>
+            <p className = 'text-center text-white mt-5'>This site was created by Teams</p>
+        </div>
+        </>
     );
 };
 export default Dashboard;

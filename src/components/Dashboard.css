@@ -354,4 +354,7 @@ overflow-y:auto;
   justify-content: flex-start; /* Align items to the left */
   gap: 10px; /* Space between items, adjust as needed */
 }
+.modal-open{
+  padding:0 !important;
+}
 
